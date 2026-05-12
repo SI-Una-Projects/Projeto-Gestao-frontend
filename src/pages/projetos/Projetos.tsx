@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 
-import { listarProjetos } from "../../services/projetoService";
-import  type { Projeto } from "../../types/Projeto";
+import {
+  listarProjetos,
+  deletarProjeto
+} from "../../services/projetoService";
+import type { Projeto } from "../../types/Projeto";
+import { ProjetoCard } from "../../components/projeto/ProjetoCard";
+import { ProjetoForm } from "../../components/projeto/ProjetoForm";
 
 function Projetos() {
   const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [mostraForm, setMostraForm] = useState(false);
+  const [selecionado, setSelecionado] = useState<Projeto | undefined>(undefined);
 
   useEffect(() => {
     carregarProjetos();
@@ -19,30 +26,66 @@ function Projetos() {
     }
   }
 
+  function abrirNovo() {
+    setSelecionado(undefined);
+    setMostraForm(true);
+  }
+
+  function handleEdit(projeto: Projeto) {
+    setSelecionado(projeto);
+    setMostraForm(true);
+  }
+
+  async function handleDelete(id: number) {
+    if (!confirm("Deseja realmente excluir este projeto?")) return;
+
+    try {
+      await deletarProjeto(id);
+      await carregarProjetos();
+    } catch (err) {
+      console.error("Erro ao excluir projeto", err);
+    }
+  }
+
+  function closeFormAndRefresh() {
+    setMostraForm(false);
+    setSelecionado(undefined);
+    carregarProjetos();
+  }
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">
-        Projetos
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Projetos</h1>
+
+        <div>
+          <button
+            onClick={abrirNovo}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+          >
+            Novo Projeto
+          </button>
+        </div>
+      </div>
+
+      {mostraForm && (
+        <div className="mb-6">
+          <ProjetoForm
+            projetoInicial={selecionado}
+            onSuccess={closeFormAndRefresh}
+            onCancel={() => setMostraForm(false)}
+          />
+        </div>
+      )}
 
       <div className="grid gap-4">
         {projetos.map((projeto) => (
-          <div
+          <ProjetoCard
             key={projeto.id}
-            className="bg-white shadow rounded-xl p-4"
-          >
-            <h2 className="text-xl font-semibold">
-              {projeto.nome}
-            </h2>
-
-            <p className="text-gray-600 mt-2">
-              {projeto.descricao}
-            </p>
-
-            <span className="inline-block mt-4 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-              {projeto.status}
-            </span>
-          </div>
+            projeto={projeto}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
     </div>

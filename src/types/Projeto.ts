@@ -3,4 +3,9 @@ export interface Projeto {
   nome: string;
   descricao: string;
   status: string;
+  dataInicio?: string;
+  dataFimPrevista?: string;
+  gerenteResponsavel?: {
+    nomeCompleto?: string;
+  };
 }

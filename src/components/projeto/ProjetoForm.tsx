@@ -1,15 +1,48 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { Projeto } from "../../types/Projeto";
+import { criarProjeto, atualizarProjeto } from "../../services/projetoService";
+import { listarUsuarios } from "../../services/usuarioService";
+import type { Usuario } from "../../types/Usuario";
 
-export function ProjetoForm() {
+type Props = {
+  projetoInicial?: Partial<Projeto>;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+};
 
+export function ProjetoForm({ projetoInicial, onSuccess, onCancel }: Props) {
   const [formData, setFormData] = useState({
-    nome: "",
-    descricao: "",
-    dataInicio: "",
-    dataFimPrevista: "",
-    status: "PLANEJADO",
-    gerenteId: ""
+    nome: projetoInicial?.nome || "",
+    descricao: projetoInicial?.descricao || "",
+    dataInicio: (projetoInicial as any)?.dataInicio || "",
+    dataFimPrevista: (projetoInicial as any)?.dataFimPrevista || "",
+    status: projetoInicial?.status || "PLANEJADO",
+    gerenteId: (projetoInicial as any)?.gerenteId || ""
   });
+
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+
+  useEffect(() => {
+    if (projetoInicial) {
+      setFormData((prev) => ({
+        ...prev,
+        nome: projetoInicial.nome || "",
+        descricao: projetoInicial.descricao || "",
+        status: projetoInicial.status || "PLANEJADO",
+        dataInicio: (projetoInicial as any).dataInicio || "",
+        dataFimPrevista: (projetoInicial as any).dataFimPrevista || ""
+      }));
+    }
+    // carregar lista de usuários para preencher o select de gerente
+    (async () => {
+      try {
+        const u = await listarUsuarios();
+        setUsuarios(u);
+      } catch (err) {
+        console.error("Erro ao carregar usuários para select de gerente", err);
+      }
+    })();
+  }, [projetoInicial]);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -23,9 +56,18 @@ export function ProjetoForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    console.log(formData);
+    try {
+      if ((projetoInicial as any)?.id) {
+        await atualizarProjeto((projetoInicial as any).id, formData);
+      } else {
+        await criarProjeto(formData);
+      }
 
-    // depois vamos conectar na API
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error("Erro ao salvar projeto", err);
+      // aqui poderíamos mostrar notificação de erro
+    }
   }
 
   return (
@@ -35,7 +77,7 @@ export function ProjetoForm() {
     >
 
       <h2 className="text-2xl font-bold text-gray-800">
-        Novo Projeto
+        { (projetoInicial as any)?.id ? "Editar Projeto" : "Novo Projeto" }
       </h2>
 
       <input
@@ -94,12 +136,42 @@ export function ProjetoForm() {
         </option>
       </select>
 
-      <button
-        type="submit"
-        className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg transition"
-      >
-        Salvar Projeto
-      </button>
+      <div className="relative">
+        <select
+          name="gerenteId"
+          value={formData.gerenteId as any}
+          onChange={handleChange}
+          className="w-full border rounded-lg p-3"
+        >
+          <option value="">-- Selecionar gerente (opcional) --</option>
+          {usuarios.map((u) => (
+            <option key={u.id} value={u.id}>{u.nomeCompleto} ({u.email})</option>
+          ))}
+        </select>
+
+        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </div>
+
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg transition"
+        >
+          Salvar
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onCancel && onCancel()}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-lg transition"
+        >
+          Cancelar
+        </button>
+      </div>
 
     </form>
   );

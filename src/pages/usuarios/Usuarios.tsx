@@ -1,88 +1,87 @@
+import { useEffect, useState } from "react";
+
+import { listarUsuarios, deletarUsuario } from "../../services/usuarioService";
+import CardUsuario from "../../components/UsuarioCard";
+import FormUsuario from "../../components/UsuarioForm";
+
+import type { Usuario } from "../../types/Usuario";
+
 export default function Usuarios() {
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [mostraForm, setMostraForm] = useState(false);
+  const [selecionado, setSelecionado] = useState<Usuario | undefined>(undefined);
+
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
+
+  async function carregarUsuarios() {
+    try {
+      const data = await listarUsuarios();
+      console.log("listarUsuarios returned:", data);
+      setUsuarios(data);
+    } catch (error) {
+      console.error("Erro ao carregar usuários", error);
+    }
+  }
+
+  function abrirNovo() {
+    setSelecionado(undefined);
+    setMostraForm(true);
+  }
+
+  function handleEdit(usuario: Usuario) {
+    setSelecionado(usuario);
+    setMostraForm(true);
+  }
+
+  async function handleDelete(id: number) {
+    if (!confirm("Deseja realmente excluir este usuário?")) return;
+
+    try {
+      await deletarUsuario(id);
+      await carregarUsuarios();
+    } catch (err) {
+      console.error("Erro ao excluir usuário", err);
+    }
+  }
+
+  function closeFormAndRefresh() {
+    setMostraForm(false);
+    setSelecionado(undefined);
+    carregarUsuarios();
+  }
+
   return (
     <div className="flex flex-col gap-6">
 
-      <div className="bg-white p-6 rounded shadow">
+      <div className="flex items-center justify-between bg-white p-6 rounded shadow">
+        <h1 className="text-3xl font-bold">Usuários</h1>
 
-        <h1 className="text-3xl font-bold mb-6">
-          Usuários
-        </h1>
-
-        <form className="grid grid-cols-2 gap-4">
-
-          <input
-            type="text"
-            placeholder="Nome"
-            className="border p-2 rounded"
-          />
-
-          <input
-            type="email"
-            placeholder="Email"
-            className="border p-2 rounded"
-          />
-
-          <input
-            type="text"
-            placeholder="Cargo"
-            className="border p-2 rounded"
-          />
-
-          <input
-            type="text"
-            placeholder="Login"
-            className="border p-2 rounded"
-          />
-
-          <input
-            type="password"
-            placeholder="Senha"
-            className="border p-2 rounded"
-          />
-
-          <select className="border p-2 rounded">
-
-            <option>
-              ADMIN
-            </option>
-
-            <option>
-              GERENTE
-            </option>
-
-            <option>
-              COLABORADOR
-            </option>
-
-          </select>
-
+        <div>
           <button
-            className="bg-blue-600 text-white p-2 rounded col-span-2"
+            onClick={abrirNovo}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
           >
-            Cadastrar Usuário
+            Novo Usuário
           </button>
-
-        </form>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-
-        <div className="bg-white p-4 rounded shadow">
-
-          <h2 className="text-xl font-bold">
-            Iago Willian
-          </h2>
-
-          <p>
-            Desenvolvedor
-          </p>
-
-          <p>
-            ADMIN
-          </p>
-
+      {mostraForm && (
+        <div className="bg-white p-6 rounded shadow">
+          <FormUsuario
+            usuarioInicial={selecionado}
+            onSuccess={closeFormAndRefresh}
+            onCancel={() => setMostraForm(false)}
+          />
         </div>
+      )}
 
+      <div className="grid grid-cols-3 gap-4">
+        {usuarios.map((usuario) => (
+          <CardUsuario key={usuario.id} usuario={usuario} onEdit={handleEdit} onDelete={handleDelete} />
+        ))}
       </div>
 
     </div>

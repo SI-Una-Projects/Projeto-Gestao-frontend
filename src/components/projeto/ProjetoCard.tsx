@@ -1,20 +1,12 @@
-type Projeto = {
-  id: number;
-  nome: string;
-  descricao: string;
-  status: string;
-  dataInicio: string;
-  dataFimPrevista: string;
-  gerenteResponsavel?: {
-    nomeCompleto: string;
-  };
-};
+import type { Projeto } from "../../types/Projeto";
 
 type Props = {
   projeto: Projeto;
+  onEdit?: (projeto: Projeto) => void;
+  onDelete?: (id: number) => void;
 };
 
-export function ProjetoCard({ projeto }: Props) {
+export function ProjetoCard({ projeto, onEdit, onDelete }: Props) {
   return (
     <div className="bg-white rounded-xl shadow-md p-5 border border-gray-200">
 
@@ -53,11 +45,17 @@ export function ProjetoCard({ projeto }: Props) {
 
       <div className="flex gap-3 mt-5">
 
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+        <button
+          onClick={() => onEdit && onEdit(projeto)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+        >
           Editar
         </button>
 
-        <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+        <button
+          onClick={() => onDelete && onDelete(projeto.id)}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+        >
           Excluir
         </button>
 
