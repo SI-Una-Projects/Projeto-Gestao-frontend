@@ -1,11 +1,11 @@
-export interface Projeto {
+export type Projeto = {
   id: number;
   nome: string;
   descricao: string;
   status: string;
-  dataInicio?: string;
-  dataFimPrevista?: string;
-  gerenteResponsavel?: {
-    nomeCompleto?: string;
-  };
-}
+  dataInicio: string;
+  dataFimPrevista: string;
+
+  gerenteId?: number;
+  gerenteNome?: string;
+};

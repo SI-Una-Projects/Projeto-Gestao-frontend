@@ -38,7 +38,7 @@ export function ProjetoCard({ projeto, onEdit, onDelete }: Props) {
 
         <p>
           <strong>Gerente:</strong>{" "}
-          {projeto.gerenteResponsavel?.nomeCompleto || "Não definido"}
+          {projeto.gerenteNome || "Não definido"}
         </p>
 
       </div>
@@ -46,14 +46,14 @@ export function ProjetoCard({ projeto, onEdit, onDelete }: Props) {
       <div className="flex gap-3 mt-5">
 
         <button
-          onClick={() => onEdit && onEdit(projeto)}
+          onClick={() => onEdit?.(projeto)}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
           Editar
         </button>
 
         <button
-          onClick={() => onDelete && onDelete(projeto.id)}
+          onClick={() => onDelete?.(projeto.id)}
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
         >
           Excluir

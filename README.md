@@ -56,7 +56,6 @@ Payloads (exemplos somenos — adapte ao seu backend):
 ```json
 {
   "nome": "Nome Completo",
-  "nomeCompleto": "Nome Completo",
   "cpf": "00000000000",
   "email": "user@example.com",
   "login": "usuario",
