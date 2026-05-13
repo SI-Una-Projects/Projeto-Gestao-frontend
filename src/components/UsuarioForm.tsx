@@ -1,63 +1,196 @@
 import { useEffect, useState } from "react";
-import { criarUsuario, atualizarUsuario } from "../services/usuarioService";
+
+import {
+  criarUsuario,
+  atualizarUsuario
+} from "../services/usuarioService";
+
 import type { Usuario } from "../types/Usuario";
 
 type Props = {
-  usuarioInicial?: Partial<Usuario> & { id?: number };
+  usuarioInicial?: Partial<Usuario> & {
+    id?: number;
+  };
+
   onSuccess?: () => void;
   onCancel?: () => void;
 };
 
-export default function FormUsuario({ usuarioInicial, onSuccess, onCancel }: Props) {
-  const [nomeCompleto, setNomeCompleto] = useState(usuarioInicial?.nomeCompleto || "");
-  const [cpf, setCpf] = useState(usuarioInicial?.cpf || "");
-  const [email, setEmail] = useState(usuarioInicial?.email || "");
-  const [login, setLogin] = useState(usuarioInicial?.login || "");
+export default function UsuarioForm({
+  usuarioInicial,
+  onSuccess,
+  onCancel
+}: Props) {
+
+  const [nome, setNome] = useState(
+    usuarioInicial?.nome || ""
+  );
+
+  const [cpf, setCpf] = useState(
+    usuarioInicial?.cpf || ""
+  );
+
+  const [email, setEmail] = useState(
+    usuarioInicial?.email || ""
+  );
+
+  const [cargo, setCargo] = useState(
+    usuarioInicial?.cargo || ""
+  );
+
+  const [login, setLogin] = useState(
+    usuarioInicial?.login || ""
+  );
+
   const [senha, setSenha] = useState("");
-  const [perfil, setPerfil] = useState<Usuario["perfil"]>(usuarioInicial?.perfil || "COLABORADOR");
+
+  const [perfil, setPerfil] =
+    useState<Usuario["perfil"]>(
+      usuarioInicial?.perfil ||
+      "COLABORADOR"
+    );
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   useEffect(() => {
+
     if (usuarioInicial) {
-      setNomeCompleto(usuarioInicial.nomeCompleto || "");
-      setCpf(usuarioInicial.cpf || "");
-      setEmail(usuarioInicial.email || "");
-      setLogin(usuarioInicial.login || "");
-      setPerfil(usuarioInicial.perfil || "COLABORADOR");
+
+      setNome(
+        usuarioInicial.nome || ""
+      );
+
+      setCpf(
+        usuarioInicial.cpf || ""
+      );
+
+      setEmail(
+        usuarioInicial.email || ""
+      );
+
+      setCargo(
+        usuarioInicial.cargo || ""
+      );
+
+      setLogin(
+        usuarioInicial.login || ""
+      );
+
+      setPerfil(
+        usuarioInicial.perfil ||
+        "COLABORADOR"
+      );
     }
+
   }, [usuarioInicial]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(
+    e: React.FormEvent
+  ) {
+
     e.preventDefault();
 
+    setLoading(true);
+
+    setError(null);
+
     try {
-  const dados: any = { nome: nomeCompleto, nomeCompleto, cpf, email, perfil, login };
-      if (senha) dados.senha = senha; // só enviar senha quando preenchida
+
+      const dados: any = {
+
+        nome,
+
+        cpf,
+
+        email,
+
+        cargo: perfil,
+
+        login,
+
+        perfil
+      };
+
+      if (senha) {
+        dados.senha = senha;
+      }
+
+      console.log(
+        "[UsuarioForm] payload ->",
+        dados
+      );
 
       if (usuarioInicial?.id) {
-        await atualizarUsuario(usuarioInicial.id, dados);
+
+        await atualizarUsuario(
+          usuarioInicial.id,
+          dados
+        );
+
       } else {
+
         await criarUsuario(dados);
       }
 
-      if (onSuccess) onSuccess();
-    } catch (err) {
-      console.error("Erro ao salvar usuário", err);
+      if (onSuccess) {
+        onSuccess();
+      }
+
+    } catch (err: any) {
+
+      console.error(
+        "[UsuarioForm] erro ->",
+        err
+      );
+
+      setError(
+        err?.response?.data?.message ||
+        "Erro ao salvar usuário"
+      );
+
+    } finally {
+
+      setLoading(false);
     }
   }
 
   return (
     <div className="bg-white p-6 rounded shadow">
 
-      <h2 className="text-2xl font-bold mb-4">{usuarioInicial?.id ? "Editar Usuário" : "Cadastrar Usuário"}</h2>
+      <h2 className="text-2xl font-bold mb-4">
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {usuarioInicial?.id
+          ? "Editar Usuário"
+          : "Cadastrar Usuário"}
+
+      </h2>
+
+      {error && (
+
+        <div className="mb-4 text-red-700 bg-red-100 p-2 rounded">
+          {error}
+        </div>
+
+      )}
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
 
         <input
           type="text"
-          placeholder="Nome completo"
+          placeholder="Nome"
           className="border p-2 rounded"
-          value={nomeCompleto}
-          onChange={(e) => setNomeCompleto(e.target.value)}
+          value={nome}
+          onChange={(e) =>
+            setNome(e.target.value)
+          }
+          required
         />
 
         <input
@@ -65,7 +198,10 @@ export default function FormUsuario({ usuarioInicial, onSuccess, onCancel }: Pro
           placeholder="CPF"
           className="border p-2 rounded"
           value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
+          onChange={(e) =>
+            setCpf(e.target.value)
+          }
+          required
         />
 
         <input
@@ -73,15 +209,23 @@ export default function FormUsuario({ usuarioInicial, onSuccess, onCancel }: Pro
           placeholder="Email"
           className="border p-2 rounded"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
+          required
         />
+
+        
 
         <input
           type="text"
           placeholder="Login"
           className="border p-2 rounded"
           value={login}
-          onChange={(e) => setLogin(e.target.value)}
+          onChange={(e) =>
+            setLogin(e.target.value)
+          }
+          required
         />
 
         <input
@@ -89,36 +233,60 @@ export default function FormUsuario({ usuarioInicial, onSuccess, onCancel }: Pro
           placeholder="Senha"
           className="border p-2 rounded"
           value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          onChange={(e) =>
+            setSenha(e.target.value)
+          }
+          required={!usuarioInicial?.id}
         />
 
-        <div className="relative">
-          <select
-            className="appearance-none border p-2 rounded w-full"
-            value={perfil}
-            onChange={(e) => setPerfil(e.target.value as Usuario["perfil"])}
-          >
-            <option value="ADMIN">ADMIN</option>
-            <option value="GERENTE">GERENTE</option>
-            <option value="COLABORADOR">COLABORADOR</option>
-          </select>
+        <select
+          className="border p-2 rounded"
+          value={perfil}
+          onChange={(e) =>
+            setPerfil(
+              e.target.value as Usuario["perfil"]
+            )
+          }
+        >
 
-          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-            <svg
-              className="w-4 h-4 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </span>
-        </div>
+          <option value="ADMIN">
+            ADMIN
+          </option>
+
+          <option value="GERENTE">
+            GERENTE
+          </option>
+
+          <option value="COLABORADOR">
+            COLABORADOR
+          </option>
+
+        </select>
 
         <div className="flex gap-2">
-          <button className="bg-blue-600 text-white p-2 rounded" type="submit">Salvar</button>
-          <button type="button" onClick={() => onCancel && onCancel()} className="bg-gray-200 p-2 rounded">Cancelar</button>
+
+          <button
+            className="bg-blue-600 text-white p-2 rounded"
+            type="submit"
+            disabled={loading}
+          >
+
+            {loading
+              ? "Salvando..."
+              : "Salvar"}
+
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              onCancel && onCancel()
+            }
+            className="bg-gray-200 p-2 rounded"
+          >
+            Cancelar
+          </button>
+
         </div>
 
       </form>

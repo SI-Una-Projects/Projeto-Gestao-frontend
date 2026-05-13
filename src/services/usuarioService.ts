@@ -1,26 +1,26 @@
 import api from "../api/api";
 
 export async function listarUsuarios() {
-  const response = await api.get("/usuarios");
-  return response.data;
-}
-
-export async function criarUsuario(dados: any) {
-  const response = await api.post("/usuarios", dados);
-  return response.data;
+  console.log("[usuarioService] GET /usuarios");
+  return api.get("/usuarios");
 }
 
 export async function buscarUsuarioPorId(id: number) {
-  const response = await api.get(`/usuarios/${id}`);
-  return response.data;
+  console.log(`[usuarioService] GET /usuarios/${id}`);
+  return api.get(`/usuarios/${id}`);
 }
 
-export async function atualizarUsuario(id: number, dados: any) {
-  const response = await api.put(`/usuarios/${id}`, dados);
-  return response.data;
+export async function criarUsuario(payload: any) {
+  console.log("[usuarioService] POST /usuarios payload ->", payload);
+  return api.post("/usuarios", payload);
+}
+
+export async function atualizarUsuario(id: number, payload: any) {
+  console.log(`[usuarioService] PUT /usuarios/${id} payload ->`, payload);
+  return api.put(`/usuarios/${id}`, payload);
 }
 
 export async function deletarUsuario(id: number) {
-  const response = await api.delete(`/usuarios/${id}`);
-  return response.data;
+  console.log(`[usuarioService] DELETE /usuarios/${id}`);
+  return api.delete(`/usuarios/${id}`);
 }
