@@ -104,8 +104,10 @@ Você pode listar os integrantes da equipe diretamente neste README usando a se�
 
 | Nome | Função | Email |
 |------|--------|-------|
-| Iago Willian | Fullstack | iago@email.com |
-| Fulano de Tal | Frontend | fulano@example.com |
+| Iago Willian | Fullstack | iagowillian22@gamil.com|
+| Glaucia Oliveira | Fullstack | glauciano77@gmail.com |
+| Caroline Marques | Fullstack | carolbmarques@hotmail.com |
+| Mariana Ambrosio | Fullstack | 
 
 Adicione/remova linhas conforme necessário. Se preferir, mantenha essa lista em `CONTRIBUTORS.md` e aponte para ela daqui.
 
