@@ -107,7 +107,7 @@ Você pode listar os integrantes da equipe diretamente neste README usando a se�
 | Iago Willian | Fullstack | iagowillian22@gamil.com|
 | Glaucia Oliveira | Fullstack | glauciano77@gmail.com |
 | Caroline Marques | Fullstack | carolbmarques@hotmail.com |
-| Mariana Ambrosio | Fullstack | marianambrz@hotmail.com |
+| Mariana Ambrozio | Fullstack | marianambrz@hotmail.com |
 
 Adicione/remova linhas conforme necessário. Se preferir, mantenha essa lista em `CONTRIBUTORS.md` e aponte para ela daqui.
 
