@@ -108,6 +108,7 @@ Você pode listar os integrantes da equipe diretamente neste README usando a se�
 | Glaucia Oliveira | Fullstack | glauciano77@gmail.com |
 | Caroline Marques | Fullstack | carolbmarques@hotmail.com |
 | Mariana Ambrozio | Fullstack | marianambrz@hotmail.com |
+| Adriel Oliveira  | Fullstack | adrielsujo@gmail.com |
 
 Adicione/remova linhas conforme necessário. Se preferir, mantenha essa lista em `CONTRIBUTORS.md` e aponte para ela daqui.
 
